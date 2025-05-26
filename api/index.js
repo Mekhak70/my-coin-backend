@@ -14,6 +14,8 @@ app.get('/', (req, res) => {
 });
 
 app.post('/auth/telegram', (req, res) => {
+    console.log("Request body:", req.body); // Ավելացնում ենք այս տողը
+
     const { id, username, first_name, last_name, hash } = req.body;
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -29,6 +31,8 @@ app.post('/auth/telegram', (req, res) => {
         res.json({ success: false, message: 'Invalid Telegram login' });
     }
 });
+
+
 
 // Վերադարձնենք server listen, որպեսզի Render-ում աշխատի
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
