@@ -5,6 +5,7 @@ function checkTelegramAuth(data, botToken) {
   const { hash, ...rest } = data;
 
   const dataCheckString = Object.keys(rest)
+    .filter(key => rest[key]) // Անտեսում ենք դատարկ դաշտերը
     .sort()
     .map(key => `${key}=${rest[key]}`)
     .join('\n');
