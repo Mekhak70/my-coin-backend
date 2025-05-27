@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { checkTelegramAuth } = require('../utils'); // ✅ ուղին այսպես թող, եթե utils.js ու index.js միևնույն մակարդակում են
+const { checkTelegramAuth } = require('./utils'); // ✅ ուղին այսպես թող, եթե utils.js ու index.js միևնույն մակարդակում են
 
 const app = express();
 app.use(cors());
