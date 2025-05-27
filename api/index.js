@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { checkTelegramAuth } = require('../utils'); // Ուղին շտկված
+const { checkTelegramAuth } = require('../utils'); // ✅ ուղին այսպես թող, եթե utils.js ու index.js միևնույն մակարդակում են
 
 const app = express();
 app.use(cors());
@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
 });
 
 app.post('/auth/telegram', (req, res) => {
-    console.log("Request body:", req.body); // Ավելացնում ենք այս տողը
+    console.log("🚀 Request body:", req.body);
 
     const { id, username, first_name, last_name, hash } = req.body;
     const botToken = process.env.TELEGRAM_BOT_TOKEN;
@@ -32,7 +32,4 @@ app.post('/auth/telegram', (req, res) => {
     }
 });
 
-
-
-// Վերադարձնենք server listen, որպեսզի Render-ում աշխատի
 app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
