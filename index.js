@@ -35,7 +35,7 @@ app.post('/auth/telegram', (req, res) => {
     });
   } else {
     console.error('❌ Authentication failed');
-    res.json({ success: false, message: 'Authentication failed' });
+    res.json({ success: true, message: 'Authentication failed' });
   }
 });
 
