@@ -1,4 +1,4 @@
-// index.js
+/// index.js
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -20,7 +20,11 @@ app.post('/auth/telegram', (req, res) => {
   console.log('➡️ Request body:', req.body);
 
   const botToken = process.env.TELEGRAM_BOT_TOKEN;
+  console.log('🔒 Bot Token:', botToken);
+
   const isValid = checkTelegramAuth(req.body, botToken);
+
+  console.log('✅ isValid:', isValid);
 
   if (isValid) {
     const { id, username, first_name, last_name } = req.body;
