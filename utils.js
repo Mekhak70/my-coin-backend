@@ -1,4 +1,3 @@
-// utils.js
 const crypto = require('crypto');
 
 function checkTelegramAuth(data, botToken) {
@@ -13,7 +12,7 @@ function checkTelegramAuth(data, botToken) {
   const secret = crypto.createHash('sha256').update(botToken).digest();
   const hmac = crypto.createHmac('sha256', secret).update(dataCheckString).digest('hex');
 
-  // 🛡️ Debugging outputs
+  // Debugging logs
   console.log('🔎 dataCheckString:', dataCheckString);
   console.log('🔎 hmac:', hmac);
   console.log('🔎 hash:', hash);

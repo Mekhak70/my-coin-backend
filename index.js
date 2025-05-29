@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
-const crypto = require('crypto');
 const dotenv = require('dotenv');
+const { checkTelegramAuth } = require('./utils');
 
 dotenv.config();
 
@@ -10,17 +10,7 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || 'YOUR_BOT_TOKEN';
-
-// Telegram authentication checker
-function checkTelegramAuth(data, botToken) {
-  const secret = crypto.createHash('sha256').update(botToken).digest();
-  const { hash, ...fields } = data;
-  const sortedKeys = Object.keys(fields).sort();
-  const dataCheckString = sortedKeys.map(key => `${key}=${fields[key]}`).join('\n');
-  const hmac = crypto.createHmac('sha256', secret).update(dataCheckString).digest('hex');
-  return hmac === hash;
-}
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '7328505047:AAHj2VTMQ0aWCLOssN62Dkim4GKQKBTnDLk';
 
 // Routes
 app.get('/', (req, res) => {
