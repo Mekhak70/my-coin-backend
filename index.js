@@ -29,7 +29,11 @@ app.get('/', (req, res) => {
 
 app.post('/auth/telegram', (req, res) => {
   console.log('➡️ Incoming Telegram Data:', req.body);
+  console.log('➡️ Provided hash:', req.body.hash);
+
   const isValid = checkTelegramAuth(req.body, TELEGRAM_BOT_TOKEN);
+  console.log('➡️ Hash validation result:', isValid);
+
   if (isValid) {
     const { id, username, first_name, last_name } = req.body;
     res.json({
