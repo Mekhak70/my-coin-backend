@@ -1,3 +1,4 @@
+// index.js
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
@@ -10,8 +11,9 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '7328505047:AAHj2VTMQ0aWCLOssN62Dkim4GKQKBTnDLk';
 
+// Telegram hash ստուգման ֆունկցիա
 function checkTelegramAuth(data, botToken) {
   if (!data || !data.hash) {
     console.log('❌ Hash missing from data');
@@ -19,7 +21,6 @@ function checkTelegramAuth(data, botToken) {
   }
 
   const { hash, ...rest } = data;
-
   const dataCheckString = Object.keys(rest)
     .sort()
     .map(key => `${key}=${rest[key]}`)
@@ -28,19 +29,14 @@ function checkTelegramAuth(data, botToken) {
   const secretKey = crypto.createHash('sha256').update(botToken).digest();
   const hmac = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
 
-  const isValid = hmac === hash;
-
   console.log('➡️ DataCheckString:', dataCheckString);
   console.log('➡️ Calculated hash:', hmac);
   console.log('➡️ Provided hash:', hash);
 
-  return isValid;
+  return hmac === hash;
 }
 
-app.get('/', (req, res) => {
-  res.send('Hello from My Coin Backend 🚀');
-});
-
+// Telegram Auth API
 app.post('/auth/telegram', (req, res) => {
   console.log('➡️ Incoming Telegram Data:', req.body);
 
@@ -60,6 +56,11 @@ app.post('/auth/telegram', (req, res) => {
       message: 'Հավաստիացումը ձախողվեց',
     });
   }
+});
+
+// Backend հիմնական էջ
+app.get('/', (req, res) => {
+  res.send('Hello from My Coin Backend 🚀');
 });
 
 app.listen(PORT, () => {
