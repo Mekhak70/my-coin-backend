@@ -1,7 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
-const { checkTelegramAuth } = require('./utils');
+const crypto = require('crypto');
 
 dotenv.config();
 
@@ -10,7 +10,32 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '7328505047:AAHj2VTMQ0aWCLOssN62Dkim4GKQKBTnDLk';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+
+function checkTelegramAuth(data, botToken) {
+  if (!data || !data.hash) {
+    console.log('❌ Hash missing from data');
+    return false;
+  }
+
+  const { hash, ...rest } = data;
+
+  const dataCheckString = Object.keys(rest)
+    .sort()
+    .map(key => `${key}=${rest[key]}`)
+    .join('\n');
+
+  const secretKey = crypto.createHash('sha256').update(botToken).digest();
+  const hmac = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
+
+  const isValid = hmac === hash;
+
+  console.log('➡️ DataCheckString:', dataCheckString);
+  console.log('➡️ Calculated hash:', hmac);
+  console.log('➡️ Provided hash:', hash);
+
+  return isValid;
+}
 
 app.get('/', (req, res) => {
   res.send('Hello from My Coin Backend 🚀');
