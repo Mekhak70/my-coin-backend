@@ -1,8 +1,7 @@
-// index.js
 const express = require('express');
 const cors = require('cors');
+const crypto = require('crypto');
 const dotenv = require('dotenv');
-const { checkTelegramAuth } = require('./utils');
 
 dotenv.config();
 
@@ -10,28 +9,27 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-const PORT = process.env.PORT || 4000;
+const PORT = process.env.PORT || 3000;
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN  
 
+// Telegram authentication checker
+function checkTelegramAuth(data, botToken) {
+  const secret = crypto.createHash('sha256').update(botToken).digest();
+  const { hash, ...fields } = data;
+  const sortedKeys = Object.keys(fields).sort();
+  const dataCheckString = sortedKeys.map(key => `${key}=${fields[key]}`).join('\n');
+  const hmac = crypto.createHmac('sha256', secret).update(dataCheckString).digest('hex');
+  return hmac === hash;
+}
+
+// Routes
 app.get('/', (req, res) => {
   res.send('Hello from My Coin Backend 🚀');
 });
 
 app.post('/auth/telegram', (req, res) => {
-  console.log('🟢 New POST /auth/telegram request');
-  console.log('➡️ Request body:', req.body);
-
-  const botToken = process.env.TELEGRAM_BOT_TOKEN;
-  console.log('🔒 Bot Token:', botToken);
-
-  // Չմոռանաս՝ եթե req.body դատարկ է, պատճառը կարող է լինել data-ը x-www-form-urlencoded լինելու փոխարեն JSON լինելու:
-  if (!req.body || Object.keys(req.body).length === 0) {
-    console.error('❌ Request body is empty. Maybe wrong content-type?');
-    return res.status(400).json({ success: false, message: 'Request body is empty' });
-  }
-
-  const isValid = checkTelegramAuth(req.body, botToken);
-  console.log('✅ isValid:', isValid);
-
+  console.log('➡️ Incoming Telegram Data:', req.body);
+  const isValid = checkTelegramAuth(req.body, TELEGRAM_BOT_TOKEN);
   if (isValid) {
     const { id, username, first_name, last_name } = req.body;
     res.json({
@@ -40,8 +38,10 @@ app.post('/auth/telegram', (req, res) => {
       user: { id, username, first_name, last_name },
     });
   } else {
-    console.error('❌ Authentication failed');
-    res.json({ success: false, message: 'Authentication failed' });
+    res.json({
+      success: false,
+      message: 'Հավաստիացումը ձախողվեց',
+    });
   }
 });
 
