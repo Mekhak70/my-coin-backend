@@ -12,14 +12,12 @@ app.use(express.json());
 const PORT = process.env.PORT || 3000;
 const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '7328505047:AAHj2VTMQ0aWCLOssN62Dkim4GKQKBTnDLk';
 
-// Routes
 app.get('/', (req, res) => {
   res.send('Hello from My Coin Backend 🚀');
 });
 
 app.post('/auth/telegram', (req, res) => {
   console.log('➡️ Incoming Telegram Data:', req.body);
-  console.log('➡️ Provided hash:', req.body.hash);
 
   const isValid = checkTelegramAuth(req.body, TELEGRAM_BOT_TOKEN);
   console.log('➡️ Hash validation result:', isValid);

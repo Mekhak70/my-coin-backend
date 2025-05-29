@@ -10,6 +10,7 @@
   "author": "Mekhak",
   "license": "ISC",
   "dependencies": {
+    "@telegram-auth/server": "^1.0.4",
     "axios": "^1.9.0",
     "cors": "^2.8.5",
     "dotenv": "^16.5.0",
