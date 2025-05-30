@@ -1,7 +1,7 @@
 const axios = require('axios'); // Օգտագործում ենք axios
 
-const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN';
-const CHAT_ID = 'USER_CHAT_ID'; // Քո chat_id
+const TELEGRAM_BOT_TOKEN = '7328505047:AAHj2VTMQ0aWCLOssN62Dkim4GKQKBTnDLk';
+const CHAT_ID = '123456789'; // Քո chat_id
 
 function sendWebAppButton() {
   const data = {
