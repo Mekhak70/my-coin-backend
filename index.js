@@ -11,9 +11,11 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ; // Դնել քո bot-ի token-ը
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
-// Telegram hash ստուգման ֆունկցիա
+let lastUser = null; // Պահելու ենք վերջին հաստատված օգտատիրոջ տվյալները
+
+// Hash ստուգման ֆունկցիա
 function checkTelegramAuth(data, botToken) {
   if (!data || !data.hash) {
     console.log('❌ Hash missing from data');
@@ -35,7 +37,7 @@ function checkTelegramAuth(data, botToken) {
   return hmac === hash;
 }
 
-// Backend ռաութը Telegram-ից տվյալ ստանալու համար
+// Telegram Auth endpoint
 app.post('/auth/telegram', (req, res) => {
   console.log('➡️ Incoming Telegram Data:', req.body);
 
@@ -44,12 +46,23 @@ app.post('/auth/telegram', (req, res) => {
 
   if (isValid) {
     const { id, username, first_name, last_name, photo_url } = req.body;
+    lastUser = { id, username, first_name, last_name, photo_url };
+
     res.json({
       success: true,
-      user: { id, username, first_name, last_name, photo_url },
+      user: lastUser,
     });
   } else {
     res.json({ success: false, message: 'Invalid Telegram authentication' });
+  }
+});
+
+// Last user get endpoint (for frontend)
+app.get('/last-user', (req, res) => {
+  if (lastUser) {
+    res.json({ success: true, user: lastUser });
+  } else {
+    res.json({ success: false, message: 'No user data available' });
   }
 });
 
