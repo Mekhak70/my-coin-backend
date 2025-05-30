@@ -37,34 +37,27 @@ function checkTelegramAuth(data, botToken) {
   return hmac === hash;
 }
 
-// Telegram Auth endpoint
+// Telegram Auth endpoint (մի անգամ ստուգելու համար)
 app.post('/auth/telegram', (req, res) => {
-  console.log('➡️ Incoming Telegram Data:', req.body);
+  if (lastUser) {
+    console.log('ℹ️ User already authenticated, ignoring new request');
+    return res.json({ success: true, user: lastUser });
+  }
 
+  console.log('➡️ Incoming Telegram Data:', req.body);
   const isValid = checkTelegramAuth(req.body, TELEGRAM_BOT_TOKEN);
   console.log('➡️ Hash validation result:', isValid);
 
   if (isValid) {
     const { id, username, first_name, last_name, photo_url } = req.body;
     lastUser = { id, username, first_name, last_name, photo_url };
-
-    res.json({
-      success: true,
-      user: lastUser,
-    });
-  } else if (lastUser) {
-    console.log('ℹ️ Returning last user data (hash invalid)');
-    res.json({
-      success: true,
-      user: lastUser,
-      warning: 'Using last stored user data',
-    });
+    return res.json({ success: true, user: lastUser });
   } else {
-    res.json({ success: false, message: 'Invalid Telegram authentication' });
+    return res.json({ success: false, message: 'Invalid Telegram authentication' });
   }
 });
 
-// Last user get endpoint (optional, if you want to fetch user separately)
+// Last user get endpoint (ամեն անգամ frontend-ը էստեղից կառնի տվյալները)
 app.get('/last-user', (req, res) => {
   if (lastUser) {
     res.json({ success: true, user: lastUser });
