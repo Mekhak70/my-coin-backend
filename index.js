@@ -1,7 +1,6 @@
 // index.js
 const express = require('express');
 const cors = require('cors');
-const crypto = require('crypto');
 const dotenv = require('dotenv');
 
 dotenv.config();
@@ -11,53 +10,24 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
 
-let lastUser = null; // Պահելու ենք վերջին հաստատված օգտատիրոջ տվյալները
+let lastUser = null;
 
-// Hash ստուգման ֆունկցիա
-function checkTelegramAuth(data, botToken) {
-  if (!data || !data.hash) {
-    console.log('❌ Hash missing from data');
-    return false;
-  }
-
-  const { hash, ...rest } = data;
-  const dataCheckString = Object.keys(rest)
-    .sort()
-    .map(key => `${key}=${rest[key]}`)
-    .join('\n');
-
-  const secretKey = crypto.createHash('sha256').update(botToken).digest();
-  const hmac = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
-
-  console.log('✅ Generated HMAC:', hmac);
-  console.log('✅ Received hash:', hash);
-
-  return hmac === hash;
-}
-
-// Telegram Auth endpoint (մի անգամ ստուգելու համար)
 app.post('/auth/telegram', (req, res) => {
-  if (lastUser) {
-    console.log('ℹ️ User already authenticated, ignoring new request');
-    return res.json({ success: true, user: lastUser });
-  }
-
   console.log('➡️ Incoming Telegram Data:', req.body);
-  const isValid = checkTelegramAuth(req.body, TELEGRAM_BOT_TOKEN);
-  console.log('➡️ Hash validation result:', isValid);
 
-  if (isValid) {
+  if (!lastUser) {
     const { id, username, first_name, last_name, photo_url } = req.body;
     lastUser = { id, username, first_name, last_name, photo_url };
-    return res.json({ success: true, user: lastUser });
+    console.log('✅ User authenticated and stored:', lastUser);
   } else {
-    return res.json({ success: false, message: 'Invalid Telegram authentication' });
+    console.log('ℹ️ User already stored, skipping.');
   }
+
+  // Redirect to frontend after successful login
+  res.redirect(`https://my-coin-app.vercel.app?auth=success`);
 });
 
-// Last user get endpoint (ամեն անգամ frontend-ը էստեղից կառնի տվյալները)
 app.get('/last-user', (req, res) => {
   if (lastUser) {
     res.json({ success: true, user: lastUser });
@@ -66,7 +36,6 @@ app.get('/last-user', (req, res) => {
   }
 });
 
-// Health check
 app.get('/', (req, res) => {
   res.send('Hello from My Coin Backend 🚀');
 });
