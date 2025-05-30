@@ -52,12 +52,19 @@ app.post('/auth/telegram', (req, res) => {
       success: true,
       user: lastUser,
     });
+  } else if (lastUser) {
+    console.log('ℹ️ Returning last user data (hash invalid)');
+    res.json({
+      success: true,
+      user: lastUser,
+      warning: 'Using last stored user data',
+    });
   } else {
     res.json({ success: false, message: 'Invalid Telegram authentication' });
   }
 });
 
-// Last user get endpoint (for frontend)
+// Last user get endpoint (optional, if you want to fetch user separately)
 app.get('/last-user', (req, res) => {
   if (lastUser) {
     res.json({ success: true, user: lastUser });
