@@ -1,7 +1,7 @@
-const fetch = require('node-fetch'); // Եթե օգտագործում ես Node.js, կամ օգտագործիր axios
+const fetch = require('node-fetch'); // Հիմա ունես node-fetch
 
-const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN';
-const CHAT_ID = 'USER_CHAT_ID'; // Պետք է իմանաս օգտատիրոջ chat_id
+const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN'; // Այստեղ դիր քո բոտի տոքենը (առանց <>)!
+const CHAT_ID = 'USER_CHAT_ID'; // Այստեղ դիր օգտատիրոջ chat_id
 
 function sendWebAppButton() {
   const data = {
@@ -38,3 +38,4 @@ function sendWebAppButton() {
 }
 
 sendWebAppButton();
+
