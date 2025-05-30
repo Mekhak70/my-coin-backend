@@ -1,7 +1,7 @@
-const fetch = require('node-fetch'); // Հիմա ունես node-fetch
+const axios = require('axios'); // Օգտագործում ենք axios
 
-const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN'; // Այստեղ դիր քո բոտի տոքենը (առանց <>)!
-const CHAT_ID = 'USER_CHAT_ID'; // Այստեղ դիր օգտատիրոջ chat_id
+const TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN';
+const CHAT_ID = 'USER_CHAT_ID'; // Քո chat_id
 
 function sendWebAppButton() {
   const data = {
@@ -23,19 +23,13 @@ function sendWebAppButton() {
     }
   };
 
-  fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(data)
-  })
-  .then(response => response.json())
-  .then(result => {
-    console.log('✅ Button sent:', result);
-  })
-  .catch(error => {
-    console.error('❌ Error sending button:', error);
-  });
+  axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, data)
+    .then(response => {
+      console.log('✅ Button sent:', response.data);
+    })
+    .catch(error => {
+      console.error('❌ Error sending button:', error);
+    });
 }
 
 sendWebAppButton();
-
