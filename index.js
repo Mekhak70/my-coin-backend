@@ -1,8 +1,8 @@
 // index.js
 const express = require('express');
 const cors = require('cors');
-const dotenv = require('dotenv');
 const crypto = require('crypto');
+const dotenv = require('dotenv');
 
 dotenv.config();
 
@@ -11,7 +11,7 @@ app.use(cors());
 app.use(express.json());
 
 const PORT = process.env.PORT || 3000;
-const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN || '7328505047:AAHj2VTMQ0aWCLOssN62Dkim4GKQKBTnDLk';
+const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN ; // Դնել քո bot-ի token-ը
 
 // Telegram hash ստուգման ֆունկցիա
 function checkTelegramAuth(data, botToken) {
@@ -29,14 +29,13 @@ function checkTelegramAuth(data, botToken) {
   const secretKey = crypto.createHash('sha256').update(botToken).digest();
   const hmac = crypto.createHmac('sha256', secretKey).update(dataCheckString).digest('hex');
 
-  console.log('➡️ DataCheckString:', dataCheckString);
-  console.log('➡️ Calculated hash:', hmac);
-  console.log('➡️ Provided hash:', hash);
+  console.log('✅ Generated HMAC:', hmac);
+  console.log('✅ Received hash:', hash);
 
   return hmac === hash;
 }
 
-// Telegram Auth API
+// Backend ռաութը Telegram-ից տվյալ ստանալու համար
 app.post('/auth/telegram', (req, res) => {
   console.log('➡️ Incoming Telegram Data:', req.body);
 
@@ -44,21 +43,17 @@ app.post('/auth/telegram', (req, res) => {
   console.log('➡️ Hash validation result:', isValid);
 
   if (isValid) {
-    const { id, username, first_name, last_name } = req.body;
+    const { id, username, first_name, last_name, photo_url } = req.body;
     res.json({
       success: true,
-      message: `Բարի գալուստ, ${first_name || username || id}!`,
-      user: { id, username, first_name, last_name },
+      user: { id, username, first_name, last_name, photo_url },
     });
   } else {
-    res.json({
-      success: false,
-      message: 'Հավաստիացումը ձախողվեց',
-    });
+    res.json({ success: false, message: 'Invalid Telegram authentication' });
   }
 });
 
-// Backend հիմնական էջ
+// Health check
 app.get('/', (req, res) => {
   res.send('Hello from My Coin Backend 🚀');
 });
