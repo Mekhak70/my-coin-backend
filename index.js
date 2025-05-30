@@ -13,21 +13,20 @@ const PORT = process.env.PORT || 3000;
 
 let lastUser = null;
 
+// Telegram Auth endpoint
 app.post('/auth/telegram', (req, res) => {
   console.log('➡️ Incoming Telegram Data:', req.body);
 
-  if (!lastUser) {
-    const { id, username, first_name, last_name, photo_url } = req.body;
-    lastUser = { id, username, first_name, last_name, photo_url };
-    console.log('✅ User authenticated and stored:', lastUser);
-  } else {
-    console.log('ℹ️ User already stored, skipping.');
-  }
+  const { id, username, first_name, last_name, photo_url } = req.body;
+  lastUser = { id, username, first_name, last_name, photo_url };
 
-  // Redirect to frontend after successful login
-  res.redirect(`https://my-coin-app.vercel.app?auth=success`);
+  console.log('✅ User authenticated and stored:', lastUser);
+
+  // Redirect to frontend with success flag
+  res.redirect('https://my-coin-app.vercel.app/?auth=success');
 });
 
+// Last user get endpoint (frontend will call this)
 app.get('/last-user', (req, res) => {
   if (lastUser) {
     res.json({ success: true, user: lastUser });
@@ -36,6 +35,7 @@ app.get('/last-user', (req, res) => {
   }
 });
 
+// Health check
 app.get('/', (req, res) => {
   res.send('Hello from My Coin Backend 🚀');
 });
