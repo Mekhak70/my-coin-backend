@@ -1,35 +1,27 @@
-const axios = require('axios'); // Օգտագործում ենք axios
-
+const express = require('express');
+const app = express();
 const TELEGRAM_BOT_TOKEN = '7328505047:AAHj2VTMQ0aWCLOssN62Dkim4GKQKBTnDLk';
-const CHAT_ID = '123456789'; // Քո chat_id
+const axios = require('axios');
 
-function sendWebAppButton() {
-  const data = {
-    chat_id: CHAT_ID,
-    text: 'Բարի գալուստ My Coin App 🚀',
-    reply_markup: {
-      keyboard: [
-        [
-          {
-            text: 'Բացել My Coin App 🚀',
-            web_app: {
-              url: 'https://my-coin-app.vercel.app/'
-            }
-          }
-        ]
-      ],
-      resize_keyboard: true,
-      one_time_keyboard: true
-    }
-  };
+app.use(express.json());
 
-  axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, data)
-    .then(response => {
-      console.log('✅ Button sent:', response.data);
+app.post('/webhook', (req, res) => {
+  const message = req.body.message;
+  if (message) {
+    const chatId = message.chat.id;
+    console.log('✅ Chat ID:', chatId);
+
+    // Example: send a message back to user
+    axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      chat_id: chatId,
+      text: 'Hello! I received your message.'
     })
-    .catch(error => {
-      console.error('❌ Error sending button:', error);
-    });
-}
+    .then(() => console.log('✅ Sent confirmation message'))
+    .catch(err => console.error(err));
+  }
+  res.sendStatus(200);
+});
 
-sendWebAppButton();
+app.listen(3000, () => {
+  console.log('Server running on port 3000');
+});
