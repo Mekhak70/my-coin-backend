@@ -1,5 +1,5 @@
 const axios = require('axios');
-const TELEGRAM_BOT_TOKEN = 'քո իրական BotFather token-ը';
+const TELEGRAM_BOT_TOKEN = '8032347633:AAHyrxvRw4fYDHkOsDwsLhCoLxNxCOegwzE';
 
 async function setMenuButton() {
   try {
