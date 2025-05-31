@@ -1,27 +1,43 @@
 const express = require('express');
-const app = express();
-const TELEGRAM_BOT_TOKEN = '7328505047:AAHj2VTMQ0aWCLOssN62Dkim4GKQKBTnDLk';
 const axios = require('axios');
+const cors = require('cors');
+const dotenv = require('dotenv');
 
+dotenv.config();
+
+const app = express();
+app.use(cors());
 app.use(express.json());
 
-app.post('/webhook', (req, res) => {
-  const message = req.body.message;
-  if (message) {
-    const chatId = message.chat.id;
-    console.log('✅ Chat ID:', chatId);
+const PORT = process.env.PORT || 3000;
+const TELEGRAM_BOT_TOKEN = '8032347633:AAHyrxvRw4fYDHkOsDwsLhCoLxNxCOegwzE'; // Օրինակ՝ 8832374563:AAHyxRvRw4FYDHkOsDwsLhCoLxNxC0egwzE
 
-    // Example: send a message back to user
-    axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      chat_id: chatId,
-      text: 'Hello! I received your message.'
-    })
-    .then(() => console.log('✅ Sent confirmation message'))
-    .catch(err => console.error(err));
+// ✅ Set WebApp Menu Button
+async function setMenuButton() {
+  try {
+    const response = await axios.post(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/setChatMenuButton`, {
+      menu_button: {
+        type: 'web_app',
+        text: 'Բացել My Coin App 🚀',
+        web_app: {
+          url: 'https://my-coin-app.vercel.app' // Քո կայքի հասցեն
+        }
+      }
+    });
+
+    console.log('✅ WebApp կոճակը հաջողությամբ ավելացվեց:', response.data);
+  } catch (error) {
+    console.error('❌ Սխալ WebApp կոճակ ավելացնելիս:', error.response?.data || error.message);
   }
-  res.sendStatus(200);
+}
+
+// Հնարավոր է նաև միանգամից կանչես սա
+setMenuButton();
+
+app.get('/', (req, res) => {
+  res.send('Hello from GoPay Bot Backend 🚀');
 });
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on port ${PORT}`);
 });
