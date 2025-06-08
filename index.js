@@ -3,7 +3,7 @@ const express = require('express');
 const axios = require('axios');
 const mongoose = require('mongoose');
 const cors = require('cors');
-require('dotenv').config(); // Բերում է .env ֆայլի տվյալները
+require('dotenv').config();
 
 const app = express();
 app.use(cors());
@@ -22,7 +22,15 @@ const userSchema = new mongoose.Schema({
   balance: { type: Number, default: 0 },
 });
 
+const transactionSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
+  amount: { type: Number, required: true },
+  type: { type: String, enum: ['add', 'remove'], required: true },
+  date: { type: Date, default: Date.now },
+});
+
 const User = mongoose.model('User', userSchema);
+const Transaction = mongoose.model('Transaction', transactionSchema);
 
 // ✅ WebApp կոճակ
 async function setMenuButton() {
@@ -57,7 +65,7 @@ app.post('/get-user', async (req, res) => {
   }
 });
 
-// ✅ Update Balance
+// ✅ Update Balance + Save Transaction
 app.post('/update-balance', async (req, res) => {
   const { userId, amount, action } = req.body;
   try {
@@ -74,9 +82,25 @@ app.post('/update-balance', async (req, res) => {
     }
 
     await user.save();
+
+    const tx = new Transaction({ userId, amount, type: action });
+    await tx.save();
+
     res.json({ success: true, userId: user.userId, balance: user.balance });
   } catch (error) {
     console.error('❌ Error in /update-balance:', error);
+    res.status(500).json({ success: false, error: 'Internal server error' });
+  }
+});
+
+// ✅ Get Transactions
+app.get('/transactions', async (req, res) => {
+  const { userId } = req.query;
+  try {
+    const txs = await Transaction.find({ userId }).sort({ date: -1 });
+    res.json({ success: true, transactions: txs });
+  } catch (error) {
+    console.error('❌ Error in /transactions:', error);
     res.status(500).json({ success: false, error: 'Internal server error' });
   }
 });
